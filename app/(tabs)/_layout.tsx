@@ -10,6 +10,9 @@ import { colors } from '@/theme/colors';
 // se dibuja elevado y en color primary porque es la acción más usada.
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  // En web el área segura es 0; dejamos un mínimo para que las etiquetas no
+  // queden pegadas al borde ni las corte la esquina redondeada del marco.
+  const bottom = Math.max(insets.bottom, 18);
 
   return (
     <Tabs
@@ -17,16 +20,14 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.inkMuted,
-        // Altura + padding que suman el área segura inferior (franja del celular),
-        // para que las etiquetas no queden pegadas al borde ni se corten.
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 60 + insets.bottom,
-          paddingBottom: insets.bottom + 6,
-          paddingTop: 6,
+          height: 58 + bottom,
+          paddingBottom: bottom,
+          paddingTop: 8,
         },
-        tabBarLabelStyle: { fontSize: 11 },
+        tabBarLabelStyle: { fontSize: 11, marginTop: 2 },
       }}
     >
       <Tabs.Screen
