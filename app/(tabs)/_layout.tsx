@@ -2,24 +2,29 @@ import type { ComponentProps } from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '@/theme/colors';
 
 // Tab bar inferior de 5 destinos (Design Brief §5). El botón central de cámara
 // se dibuja elevado y en color primary porque es la acción más usada.
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.inkMuted,
+        // Altura + padding que suman el área segura inferior (franja del celular),
+        // para que las etiquetas no queden pegadas al borde ni se corten.
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 64,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom + 6,
+          paddingTop: 6,
         },
         tabBarLabelStyle: { fontSize: 11 },
       }}

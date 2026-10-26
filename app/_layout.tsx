@@ -2,6 +2,8 @@ import '../global.css';
 
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -34,11 +36,7 @@ function Gate() {
   }, [cargando, session, hogares.length, segments, router]);
 
   if (cargando) {
-    return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <Cargando />;
   }
 
   return (
@@ -51,7 +49,18 @@ function Gate() {
   );
 }
 
+function Cargando() {
+  return (
+    <View className="flex-1 items-center justify-center bg-background">
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
+  );
+}
+
 export default function RootLayout() {
+  // Precargar la fuente de iconos (Ionicons): sin esto salen cuadros vacíos.
+  const [fuentesListas] = useFonts(Ionicons.font);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PhoneFrame>
@@ -59,7 +68,7 @@ export default function RootLayout() {
           <ToastProvider>
             <AuthProvider>
               <StatusBar style="dark" />
-              <Gate />
+              {fuentesListas ? <Gate /> : <Cargando />}
             </AuthProvider>
           </ToastProvider>
         </SafeAreaProvider>
