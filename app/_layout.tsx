@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { PhoneFrame } from '@/components/PhoneFrame';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { colors } from '@/theme/colors';
 
@@ -52,12 +53,14 @@ function Gate() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <AuthProvider>
-          <StatusBar style="dark" />
-          <Gate />
-        </AuthProvider>
-      </SafeAreaProvider>
+      <PhoneFrame>
+        <SafeAreaProvider>
+          <AuthProvider>
+            <StatusBar style="dark" />
+            <Gate />
+          </AuthProvider>
+        </SafeAreaProvider>
+      </PhoneFrame>
     </GestureHandlerRootView>
   );
 }
