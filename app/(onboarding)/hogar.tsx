@@ -4,11 +4,13 @@ import { KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-nat
 import { Button, Field, Subtitulo, Titulo } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
+import { useToast } from '@/providers/ToastProvider';
 
 type Modo = 'elegir' | 'crear' | 'unirse';
 
 export default function Onboarding() {
   const { perfil, refrescar, cerrarSesion } = useAuth();
+  const toast = useToast();
   const [modo, setModo] = useState<Modo>('elegir');
   const [valor, setValor] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -16,25 +18,40 @@ export default function Onboarding() {
 
   async function crearHogar() {
     setError(null);
-    if (!valor.trim()) return setError('Ponle un nombre a tu hogar.');
+    if (!valor.trim()) {
+      setError('Ponle un nombre a tu hogar.');
+      toast.error('Ponle un nombre a tu hogar.');
+      return;
+    }
     setCargando(true);
     const { error } = await supabase.rpc('crear_hogar', { p_nombre: valor.trim() });
     setCargando(false);
-    if (error) return setError(error.message);
+    if (error) {
+      setError(error.message);
+      toast.error(error.message);
+      return;
+    }
+    toast.success(`¡Hogar "${valor.trim()}" creado! 🏠`);
     await refrescar(); // el <Gate> ve el hogar nuevo y entra a las tabs
   }
 
   async function unirse() {
     setError(null);
-    if (valor.trim().length < 6) return setError('El código tiene 6 caracteres.');
+    if (valor.trim().length < 6) {
+      setError('El código tiene 6 caracteres.');
+      toast.error('El código tiene 6 caracteres.');
+      return;
+    }
     setCargando(true);
     const { error } = await supabase.rpc('unirse_hogar', { p_codigo: valor.trim() });
     setCargando(false);
     if (error) {
-      return setError(
-        error.message.includes('inválido') ? 'Código inválido o vencido.' : error.message
-      );
+      const msg = error.message.includes('inválido') ? 'Código inválido o vencido.' : error.message;
+      setError(msg);
+      toast.error(msg);
+      return;
     }
+    toast.success('¡Te uniste al hogar! 🎉');
     await refrescar();
   }
 

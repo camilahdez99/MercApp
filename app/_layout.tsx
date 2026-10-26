@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { PhoneFrame } from '@/components/PhoneFrame';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
+import { ToastProvider } from '@/providers/ToastProvider';
 import { colors } from '@/theme/colors';
 
 // Lleva al usuario al grupo de pantallas correcto según sesión y hogar.
@@ -55,10 +56,12 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PhoneFrame>
         <SafeAreaProvider>
-          <AuthProvider>
-            <StatusBar style="dark" />
-            <Gate />
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <StatusBar style="dark" />
+              <Gate />
+            </AuthProvider>
+          </ToastProvider>
         </SafeAreaProvider>
       </PhoneFrame>
     </GestureHandlerRootView>

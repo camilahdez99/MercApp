@@ -1,23 +1,30 @@
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { Link, Stack, useRouter } from 'expo-router';
 
 import { Button, Field, Subtitulo, Titulo } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function Registro() {
   const router = useRouter();
+  const toast = useToast();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
 
+  function fallar(msg: string) {
+    setError(msg);
+    toast.error(msg);
+  }
+
   async function registrar() {
     setError(null);
-    if (!nombre.trim()) return setError('Escribe tu nombre.');
-    if (!email.trim()) return setError('Escribe tu correo.');
-    if (password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.');
+    if (!nombre.trim()) return fallar('Escribe tu nombre.');
+    if (!email.trim()) return fallar('Escribe tu correo.');
+    if (password.length < 6) return fallar('La contraseña debe tener al menos 6 caracteres.');
 
     setCargando(true);
     const { data, error } = await supabase.auth.signUp({
@@ -28,17 +35,22 @@ export default function Registro() {
     });
     setCargando(false);
 
-    if (error) return setError(error.message);
-
-    // Si el proyecto pide confirmar el correo, no hay sesión todavía.
-    if (!data.session) {
-      Alert.alert(
-        'Revisa tu correo',
-        'Te enviamos un enlace para confirmar tu cuenta. Confírmalo y vuelve a entrar.',
-        [{ text: 'Entendido', onPress: () => router.replace('/(auth)/login') }]
+    if (error) {
+      return fallar(
+        /already registered|already been/i.test(error.message)
+          ? 'Ese correo ya tiene una cuenta. Inicia sesión.'
+          : error.message
       );
     }
+
+    // Con confirmación por código: no hay sesión → pedimos el código.
+    if (!data.session) {
+      toast.success('Te enviamos un código a tu correo.');
+      router.replace({ pathname: '/(auth)/confirmar', params: { email: email.trim() } });
+      return;
+    }
     // Si hay sesión (confirmación desactivada), el <Gate> redirige a onboarding.
+    toast.success('¡Cuenta creada! Bienvenido 🎉');
   }
 
   return (

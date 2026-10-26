@@ -3,6 +3,14 @@
 Historial de sesiones de trabajo. Una entrada por sesión, la más reciente arriba.
 Formato: fecha — semana del cronograma, entregable, estado, hecho, pendiente, decisiones/bloqueos.
 
+## 2026-10-26 (tarde) — UX de autenticación (semana 3, continuación)
+**Hecho:**
+- **Avisos en la app (toasts):** `src/providers/ToastProvider.tsx` — banner animado arriba, éxito (verde) / error (rojo) / info; `useToast()` con `success/error/info`. Montado en `app/_layout.tsx`. Reemplaza los `Alert.alert` (que no se ven en web).
+- **Confirmación por código (OTP) en vez de enlace:** nueva pantalla `app/(auth)/confirmar.tsx` (código de 6 dígitos → `supabase.auth.verifyOtp({ type: 'signup' })`, con reenviar). El registro, al no haber sesión, manda a `/(auth)/confirmar` con el correo. Login detecta "correo sin confirmar" y también lleva ahí.
+- **Mensajes claros** en login / registro / recuperar / onboarding de hogar: "¡Bienvenido!", "Correo o contraseña incorrectos", "Ese correo ya tiene cuenta", "¡Hogar creado!", "¡Te uniste al hogar!", etc. Verificado en web (toast de error y pantalla de código renderizan); typecheck en verde.
+
+**Pendiente (dashboard, lo hace la usuaria):** para que el código llegue, la plantilla de correo **"Confirm signup"** debe incluir `{{ .Token }}` (hoy solo trae el enlace). Durante pruebas hay límite de correos/hora y 429 en el endpoint de auth por tanto ensayo.
+
 ## 2026-10-26 — Semana 3 (19 al 25 de octubre)
 **Entregable de la semana:** Creación de la base de datos y del registro de usuarios.
 **Estado:** código de la app completo y verificado (typecheck + bundle de Metro); migraciones de correcciones aplicadas y advisors limpios; publicado en GitHub. Falta probar la app en vivo y las pruebas de RLS con usuarios reales.

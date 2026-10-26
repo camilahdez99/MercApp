@@ -4,8 +4,10 @@ import { Link } from 'expo-router';
 
 import { Button, Field, Subtitulo, Titulo } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function Recuperar() {
+  const toast = useToast();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
@@ -13,14 +15,23 @@ export default function Recuperar() {
 
   async function enviar() {
     setError(null);
-    if (!email.trim()) return setError('Escribe tu correo.');
+    if (!email.trim()) {
+      setError('Escribe tu correo.');
+      toast.error('Escribe tu correo.');
+      return;
+    }
     setCargando(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo: 'mercapp://restablecer',
     });
     setCargando(false);
-    if (error) return setError(error.message);
+    if (error) {
+      setError(error.message);
+      toast.error(error.message);
+      return;
+    }
     setEnviado(true);
+    toast.success('Te enviamos un enlace a tu correo.');
   }
 
   return (

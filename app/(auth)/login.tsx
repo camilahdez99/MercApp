@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 import { Button, Field, Subtitulo, Titulo } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function Login() {
+  const router = useRouter();
+  const toast = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +17,9 @@ export default function Login() {
   async function entrar() {
     setError(null);
     if (!email.trim() || !password) {
-      setError('Escribe tu correo y contraseña.');
+      const msg = 'Escribe tu correo y contraseña.';
+      setError(msg);
+      toast.error(msg);
       return;
     }
     setCargando(true);
@@ -23,14 +28,24 @@ export default function Login() {
       password,
     });
     setCargando(false);
-    if (error) {
-      setError(
-        error.message.includes('Invalid login')
-          ? 'Correo o contraseña incorrectos.'
-          : error.message
-      );
+
+    if (!error) {
+      toast.success('¡Bienvenido de vuelta! 👋');
+      return; // el <Gate> redirige
     }
-    // Si entra, el <Gate> redirige solo.
+
+    // Correo sin confirmar → mandamos a escribir el código
+    if (/not confirmed|not been confirmed/i.test(error.message)) {
+      toast.error('Tu correo no está confirmado. Escribe el código que te enviamos.');
+      router.push({ pathname: '/(auth)/confirmar', params: { email: email.trim() } });
+      return;
+    }
+
+    const msg = /invalid login/i.test(error.message)
+      ? 'Correo o contraseña incorrectos.'
+      : error.message;
+    setError(msg);
+    toast.error(msg);
   }
 
   return (
