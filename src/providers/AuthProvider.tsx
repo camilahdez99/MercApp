@@ -40,26 +40,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setHogares([]);
       return;
     }
-    const [{ data: perfilData }, { data: miembros }] = await Promise.all([
-      supabase.from('perfiles').select('*').eq('id', userId).maybeSingle(),
-      supabase
-        .from('hogar_miembros')
-        .select('rol, hogares(*)')
-        .eq('usuario_id', userId)
-        .returns<{ rol: 'admin' | 'miembro'; hogares: Hogar | null }[]>(),
-    ]);
+    try {
+      const [{ data: perfilData }, { data: miembros }] = await Promise.all([
+        supabase.from('perfiles').select('*').eq('id', userId).maybeSingle(),
+        supabase
+          .from('hogar_miembros')
+          .select('rol, hogares(*)')
+          .eq('usuario_id', userId)
+          .returns<{ rol: 'admin' | 'miembro'; hogares: Hogar | null }[]>(),
+      ]);
 
-    setPerfil(perfilData ?? null);
-    const lista: HogarConRol[] = (miembros ?? [])
-      .filter((m): m is { rol: 'admin' | 'miembro'; hogares: Hogar } => m.hogares !== null)
-      .map((m) => ({ ...m.hogares, rol: m.rol }));
-    setHogares(lista);
+      setPerfil(perfilData ?? null);
+      const lista: HogarConRol[] = (miembros ?? [])
+        .filter((m): m is { rol: 'admin' | 'miembro'; hogares: Hogar } => m.hogares !== null)
+        .map((m) => ({ ...m.hogares, rol: m.rol }));
+      setHogares(lista);
+    } catch {
+      // Si falla (p. ej. rate limit), no dejamos la app colgada.
+      setPerfil(null);
+      setHogares([]);
+    }
   }, []);
 
   const refrescar = useCallback(async () => {
-    const { data } = await supabase.auth.getSession();
-    setSession(data.session);
-    await cargarDatos(data.session?.user.id);
+    // Si getSession tarda demasiado (red lenta / rate limit), no bloqueamos la
+    // carga inicial: seguimos sin sesión y la app muestra el login.
+    const conTimeout = Promise.race([
+      supabase.auth.getSession().then((r) => r.data.session),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+    ]).catch(() => null);
+
+    const sesion = await conTimeout;
+    setSession(sesion);
+    await cargarDatos(sesion?.user.id);
   }, [cargarDatos]);
 
   useEffect(() => {
