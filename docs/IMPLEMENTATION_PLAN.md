@@ -27,9 +27,9 @@ Documentos de contexto en `/docs`: PRD, TRD, APP_FLOW, DESIGN_BRIEF, BACKEND_SCH
 ## Semana 3 — 19 al 25 de octubre: Base de datos y registro de usuarios
 - [x] Proyecto Expo + TypeScript + Expo Router; NativeWind con los tokens de color del Design Brief (`tailwind.config.js`, `src/theme/colors.ts`).
 - [x] Estructura: `app/(auth)`, `app/(onboarding)`, `app/(tabs)`, `src/lib/supabase.ts`, `src/types/`, `src/providers/`, `src/components/`.
-- [x] `supabase/migrations/` con el esquema completo (01–08), semilla de categorías (09), alertas corregidas (10) y un script de correcciones de advisors. **Pendiente aplicarlas:** el proyecto Supabase está pausado (free tier); reactivarlo y correr `supabase db push` o marcar `migration repair` (el esquema ya estaba aplicado a mano).
-- [x] Tipos de BD en `src/types/database.types.ts` (a mano mientras el proyecto está pausado; regenerar con `npm run db:types`).
-- [ ] Pruebas de RLS contra Supabase (bloqueadas por el proyecto pausado; el esquema ya se validó en PGlite en la semana 2).
+- [x] `supabase/migrations/` con el esquema completo (01–08), semilla de categorías (09), alertas corregidas (10) y la migración de correcciones de advisors. Migraciones de correcciones **aplicadas** en el proyecto; advisors limpios salvo 5 de seguridad intencionales (RPC de hogares + `es_miembro`/`es_admin`) y `unused_index` (INFO, base vacía).
+- [x] Tipos de BD en `src/types/database.types.ts` generados desde el proyecto activo (`npm run db:types`).
+- [ ] Pruebas de RLS con usuarios reales (el esquema ya se validó en PGlite en la semana 2).
 - [x] Login / Registro / recuperación de contraseña / cierre de sesión, crear hogar, unirse con código, selector de hogar, tab bar de 5 destinos con estados vacíos.
 
 **Criterio de salida:** un usuario se registra, crea un hogar (o se une con código), cambia de hogar y entra a una tab bar vacía. *(Código listo y con typecheck; falta probarlo en vivo cuando Supabase vuelva a estar activo.)*

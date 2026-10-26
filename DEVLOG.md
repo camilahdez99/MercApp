@@ -5,28 +5,28 @@ Formato: fecha — semana del cronograma, entregable, estado, hecho, pendiente, 
 
 ## 2026-10-26 — Semana 3 (19 al 25 de octubre)
 **Entregable de la semana:** Creación de la base de datos y del registro de usuarios.
-**Estado:** código de la app completo y verificado (typecheck + bundle de Metro); falta probarlo en vivo y aplicar/validar las migraciones porque el proyecto Supabase está pausado.
+**Estado:** código de la app completo y verificado (typecheck + bundle de Metro); migraciones de correcciones aplicadas y advisors limpios; publicado en GitHub. Falta probar la app en vivo y las pruebas de RLS con usuarios reales.
 
 ### Hecho hoy
 - **Proyecto Expo creado en la raíz del repo** (SDK 58, React Native 0.88, Expo Router, NativeWind 4, TypeScript). `package.json`, `app.json`, `babel.config.js`, `metro.config.js`, `tailwind.config.js` (tokens del Design Brief), `global.css`, `tsconfig.json` (alias `@/*`), `.env.example`, `CLAUDE.md`. `.npmrc` con `legacy-peer-deps=true` (conflicto de parche react/react-dom en las deps web de expo-router).
 - **Estructura:** `app/(auth)` (login, registro, recuperar), `app/(onboarding)/hogar`, `app/(tabs)` (inicio, comparar, escanear, lista, tiendas) + `app/selector-hogar` (modal). `src/lib/supabase.ts`, `src/types/database.types.ts`, `src/theme/colors.ts`, `src/components/ui.tsx` + `EncabezadoHogar`, `src/providers/AuthProvider.tsx`.
 - **Auth y hogares (act. 20–24):** cliente supabase-js con AsyncStorage; `AuthProvider` lleva sesión + perfil + hogares y redirige (Gate en `_layout`): sin sesión → `(auth)`, sin hogar → `(onboarding)`, con hogar → `(tabs)`. Login, registro (con `nombre` en metadata para `fn_nuevo_usuario`), recuperación de contraseña, cierre de sesión. Crear hogar / unirse con código vía RPC `crear_hogar` / `unirse_hogar`; selector de hogar con cambio de hogar activo, invitación (`generar_invitacion` + Share) y salir. Tab bar de 5 destinos con botón de cámara central y estados vacíos (act. 19).
 - **Migraciones (act. 16):** los scripts `01`–`10` pasaron a `supabase/migrations/` (`20261019000000_esquema_inicial`, `..000100_semilla_categorias`, `20261026000000_alertas_corregidas`).
-- **Correcciones de advisors (act. 17):** nueva migración `20261026000100_correcciones_advisors.sql` — `search_path` en `fn_tocar_lista_item`; `revoke execute` a `anon`/`public` en `es_miembro`/`es_admin` y a todas las funciones de trigger; políticas de `perfiles`, `hogar_miembros`, `precios`, `alertas_config`, `notificaciones` con `(select auth.uid())`; índices para las 19 FK sin índice. **No aplicada aún** (proyecto pausado).
+- **Correcciones de advisors (act. 17) — APLICADAS:** `20261026000000_alertas_corregidas.sql` (pg_net a `extensions`, `revoke execute` a `fn_llamar_enviar_alertas`/`fn_revisar_alertas`) y `20261026000100_correcciones_advisors.sql` (`search_path` en `fn_tocar_lista_item`; `revoke execute` a `anon`/`public` en `es_miembro`/`es_admin` y a todas las funciones de trigger; políticas de `perfiles`, `hogar_miembros`, `precios`, `alertas_config`, `notificaciones` con `(select auth.uid())`; índices para las 19 FK). Aplicadas por las estudiantes desde el SQL Editor (por eso `list_migrations` sigue vacío). Advisors después: seguridad solo quedan 5 (RPC `crear_hogar`/`generar_invitacion`/`unirse_hogar` y helpers `es_miembro`/`es_admin`, **intencionales**: las llama la app o las usan las políticas RLS, que requieren EXECUTE para `authenticated`); rendimiento solo `unused_index` (INFO, normal con la base vacía).
+- **Tipos de BD regenerados** desde el proyecto activo con `npm run db:types`: `src/types/database.types.ts` ahora cubre las 16 tablas, 4 vistas y RPC con sus relaciones (antes estaba a mano con solo lo de la semana 3). Typecheck en verde.
+- **GitHub:** publicado en `camilahdez99/MercApp` rama `main` — `c104cea` (estructura inicial + semana 3) y `60a0251` (tipos regenerados). `.gitattributes` (LF) y `.npmrc` (`legacy-peer-deps`) añadidos.
 - **Verificación:** `npm run typecheck` en verde; `npx expo export --platform android` empaqueta sin errores (bundle de 5MB, 45 assets). Se resolvieron en el camino: versiones del SDK con `expo install`, `babel-preset-expo` y `react-native-worklets` faltantes (Reanimated 4 usa `react-native-worklets/plugin`, que `babel-preset-expo` añade solo → se quitó el plugin manual del `babel.config`).
 
 ### Pendiente para la próxima sesión
-- **Reactivar el proyecto Supabase** (está pausado, free tier) y:
-  - Aplicar la migración de correcciones de advisors (el resto del esquema ya estaba a mano; registrar el estado con `supabase migration repair --status applied` en las migraciones del esquema para no reaplicarlas).
-  - Regenerar `src/types/database.types.ts` con `npm run db:types` y ampliarlo (hoy solo cubre hogares/perfiles/miembros/categorías, lo que usa la semana 3).
-  - Poner la `anon key` real en `.env`.
-- **Pruebas de RLS (act. 25)** contra el proyecto ya activo: registro, login y que cada hogar solo vea sus datos. El esquema ya se validó en PGlite en la semana 2.
+- Poner la `anon key` real en `.env` (plantilla en `.env.example`) para correr la app.
+- **Pruebas de RLS (act. 25)** con usuarios reales: registro, login y que cada hogar solo vea sus datos. El esquema ya se validó en PGlite en la semana 2.
 - Probar la app en vivo (Expo Go / emulador): el criterio de salida de la semana (registrarse → crear/unirse a hogar → cambiar de hogar → tab bar).
+- Si en algún momento se usa el CLI de Supabase, registrar el estado con `supabase migration repair --status applied` (las migraciones del esquema base y las dos de correcciones ya están aplicadas a mano, por eso el historial del CLI está vacío).
 - Semana 4 (26 oct–1 nov): módulo de tiendas y productos.
 
 ### Decisiones o bloqueos
-- **Bloqueo:** proyecto Supabase pausado → no se pudieron aplicar migraciones ni correr las pruebas de RLS esta sesión. El código de la app asume el esquema ya documentado y validado.
-- Decidido: Expo Router + NativeWind; `AuthProvider` como única fuente de verdad de sesión/hogar; tipos de BD a mano mientras el proyecto esté pausado; `legacy-peer-deps` a nivel de proyecto.
+- Decidido: Expo Router + NativeWind; `AuthProvider` como única fuente de verdad de sesión/hogar; tipos de BD generados desde Supabase; `legacy-peer-deps` a nivel de proyecto.
+- Los 5 advisors de seguridad que quedan (RPC de hogares + `es_miembro`/`es_admin`) se dejan a propósito: son funciones que `authenticated` debe poder ejecutar (la app o las políticas RLS). No son un pendiente.
 
 ## 2026-10-16 — Semana del 12 al 18 de octubre
 **Entregable de la semana:** Requerimientos, diseño de la base de datos y bocetos de pantallas.
