@@ -1,0 +1,63 @@
+import '../global.css';
+
+import { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { AuthProvider, useAuth } from '@/providers/AuthProvider';
+import { colors } from '@/theme/colors';
+
+// Lleva al usuario al grupo de pantallas correcto según sesión y hogar.
+function Gate() {
+  const { cargando, session, hogares } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (cargando) return;
+    const grupo = segments[0];
+    const enAuth = grupo === '(auth)';
+    const enOnboarding = grupo === '(onboarding)';
+
+    if (!session) {
+      if (!enAuth) router.replace('/(auth)/login');
+    } else if (hogares.length === 0) {
+      if (!enOnboarding) router.replace('/(onboarding)/hogar');
+    } else if (enAuth || enOnboarding) {
+      router.replace('/(tabs)');
+    }
+  }, [cargando, session, hogares.length, segments, router]);
+
+  if (cargando) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(onboarding)" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="selector-hogar" options={{ presentation: 'modal' }} />
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <StatusBar style="dark" />
+          <Gate />
+        </AuthProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}

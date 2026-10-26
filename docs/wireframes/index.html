@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MercApp — Wireframes</title>
+<style>
+  :root{
+    --primary:#1E8E4F; --primary-dark:#0F5C30; --primary-tint:#E6F4EC; --accent:#E8872E;
+    --ink:#1A1A1A; --ink-muted:#6B7280; --surface:#FFFFFF; --background:#F7F8F7;
+    --border:#E5E7EB; --error:#D64545; --accent-tint:#FDF1E6; --error-tint:#FBEAEA;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,Roboto,"Segoe UI",system-ui,sans-serif;background:#E9ECEA;color:var(--ink);padding:32px 16px}
+  header.doc{max-width:1200px;margin:0 auto 24px}
+  header.doc h1{font-size:26px;color:var(--primary-dark)}
+  header.doc p{color:var(--ink-muted);font-size:14px;margin-top:6px;max-width:820px;line-height:1.5}
+  .seccion{max-width:1200px;margin:28px auto 8px;font-size:15px;font-weight:700;color:var(--primary-dark);border-bottom:2px solid var(--primary);padding-bottom:6px}
+  .grid{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:28px}
+  figure{width:330px}
+  figcaption{font-size:13px;font-weight:600;margin-bottom:8px}
+  figcaption span{display:block;font-weight:400;color:var(--ink-muted);font-size:12px;margin-top:2px;line-height:1.35}
+
+  /* Teléfono */
+  .phone{width:330px;height:680px;background:var(--background);border:8px solid #1F2321;border-radius:34px;overflow:hidden;position:relative;display:flex;flex-direction:column;font-size:14px}
+  .status{height:24px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font-size:11px;font-weight:600;color:var(--ink)}
+  .appbar{flex:none;display:flex;align-items:center;gap:10px;padding:8px 16px 10px}
+  .appbar h2{font-size:22px;font-weight:700}
+  .appbar .back{font-size:20px;color:var(--ink-muted)}
+  .hogar{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--primary-dark);background:var(--primary-tint);padding:4px 10px;border-radius:999px;font-weight:600}
+  .body{flex:1;overflow:hidden;padding:0 16px 12px;display:flex;flex-direction:column;gap:10px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px}
+  .muted{color:var(--ink-muted)} .meta{font-size:12px;color:var(--ink-muted)}
+  .t16{font-size:16px;font-weight:600} .price{font-weight:700} .big{font-size:26px;font-weight:800}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .chip{display:inline-block;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .chip.g{background:var(--primary-tint);color:var(--primary-dark)}
+  .chip.o{background:var(--accent-tint);color:#9A4F0B}
+  .chip.r{background:var(--error-tint);color:var(--error)}
+  .chip.n{background:#EEF0EF;color:var(--ink-muted)}
+  .btn{display:block;text-align:center;background:var(--primary);color:#fff;font-weight:700;border-radius:12px;padding:12px}
+  .btn.sec{background:var(--surface);color:var(--primary-dark);border:1.5px solid var(--primary)}
+  .btn.ghost{background:none;color:var(--primary-dark);padding:6px}
+  .input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--ink-muted)}
+  .input.f{color:var(--ink)}
+  label.l{font-size:12px;font-weight:600;color:var(--ink-muted);margin-bottom:-6px}
+  .avatar{width:38px;height:38px;border-radius:10px;background:var(--primary-tint);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none}
+  .avatar.o{background:var(--accent-tint);color:#9A4F0B}
+  .avatar.b{background:#E7EEF9;color:#24508F}
+  .list > .item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .list > .item:last-child{border-bottom:0}
+  .grow{flex:1;min-width:0}
+  .banner{background:var(--primary);color:#fff;border-radius:16px;padding:14px}
+  .banner .meta{color:#D7EFE0}
+  .bar{height:8px;border-radius:999px;background:#E3E6E4;overflow:hidden}
+  .bar > i{display:block;height:100%;background:var(--primary)}
+  .seg{display:flex;background:#E9ECEA;border-radius:10px;padding:3px;gap:3px;font-size:12px;font-weight:600}
+  .seg span{flex:1;text-align:center;padding:7px;border-radius:8px;color:var(--ink-muted)}
+  .seg span.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .conf{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+  .conf.h{background:var(--primary)} .conf.m{background:var(--accent)} .conf.lo{background:var(--error)}
+  .field{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 10px}
+  .field.warn{border-color:var(--accent)}
+  .field small{display:block;font-size:10px;color:var(--ink-muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .strike{text-decoration:line-through;color:var(--ink-muted)}
+  .placeholder{background:repeating-linear-gradient(45deg,#DADFDC,#DADFDC 8px,#E4E8E5 8px,#E4E8E5 16px);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#5B635E;font-size:12px;font-weight:600}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:20px 20px 0 0;padding:14px 16px 18px;box-shadow:0 -6px 20px rgba(0,0,0,.15);display:flex;flex-direction:column;gap:10px}
+  .scrim{position:absolute;inset:0;background:rgba(20,24,22,.45)}
+  .grab{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 4px}
+  .fab{position:absolute;right:16px;bottom:78px;width:52px;height:52px;border-radius:50%;background:var(--primary);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(30,142,79,.4)}
+
+  /* Tab bar */
+  .tabs{flex:none;height:64px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;padding:0 6px;position:relative}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--ink-muted);width:56px}
+  .tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .tab.on{color:var(--primary);font-weight:700}
+  .tab.cam{width:58px;height:58px;border-radius:50%;background:var(--primary);color:#fff;margin-top:-26px;justify-content:center;box-shadow:0 4px 12px rgba(30,142,79,.45);border:4px solid var(--background)}
+  .tab.cam svg{width:26px;height:26px}
+
+  .nota{max-width:1200px;margin:32px auto 0;font-size:13px;color:var(--ink-muted);line-height:1.5}
+
+  /* Modo captura: ?solo=<id> muestra un solo teléfono */
+  body.solo{padding:0;background:#fff}
+  body.solo header.doc, body.solo .seccion, body.solo .nota, body.solo figcaption{display:none}
+  body.solo .grid{display:block;margin:0}
+  body.solo figure{display:none;margin:0}
+  body.solo figure.ver{display:block}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM9 20v-6h6v6"/></symbol>
+</svg>
+
+<header class="doc">
+  <h1>MercApp — Wireframes de pantallas principales</h1>
+  <p>Bocetos de la semana 2 (12–18 de octubre de 2026). Siguen DESIGN_BRIEF.md (paleta, tipografía, componentes) y APP_FLOW.md (mapa y flujos). Los datos son de ejemplo. Son de fidelidad media: definen estructura, jerarquía y contenido, no el diseño final.</p>
+</header>
+
+<!-- ================= AUTENTICACIÓN ================= -->
+<div class="seccion">1. Autenticación y hogar</div>
+<div class="grid">
+
+<figure id="login"><figcaption>01 · Iniciar sesión<span>Correo y contraseña; enlace a registro.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="body" style="justify-content:center;gap:14px;padding:0 24px">
+    <div style="text-align:center;margin-bottom:14px">
+      <div class="avatar" style="width:64px;height:64px;border-radius:18px;margin:0 auto 10px;font-size:22px;background:var(--primary);color:#fff">M</div>
+      <div style="font-size:24px;font-weight:800;color:var(--primary-dark)">MercApp</div>
+      <div class="meta" style="margin-top:4px">Compara precios y gasta menos en el mercado</div>
+    </div>
+    <label class="l">Correo</label><div class="input">tucorreo@ejemplo.com</div>
+    <label class="l">Contraseña</label><div class="input">••••••••</div>
+    <div class="btn" style="margin-top:6px">Entrar</div>
+    <div class="meta" style="text-align:center">¿No tienes cuenta? <b style="color:var(--primary)">Regístrate</b></div>
+  </div>
+</div></figure>
+
+<figure id="registro"><figcaption>02 · Registro<span>Solo nombre, correo y contraseña (TRD: privacidad).</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><h2>Crea tu cuenta</h2></div>
+  <div class="body" style="gap:14px;padding:8px 24px">
+    <label class="l">Nombre</label><div class="input f">Silenia</div>
+    <label class="l">Correo</label><div class="input f">silenia@correo.com</div>
+    <label class="l">Contraseña</label><div class="input f">••••••••</div>
+    <label class="l">Confirmar contraseña</label><div class="input f">••••••••</div>
+    <div class="meta">Solo te pedimos tu nombre y tu correo.</div>
+    <div class="btn" style="margin-top:auto">Crear cuenta</div>
+  </div>
+</div></figure>
+
+<figure id="hogar"><figcaption>03 · Crear hogar o unirse<span>Primer ingreso: crear un hogar nuevo o unirse con código de 6 caracteres.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><h2>Tu hogar</h2></div>
+  <div class="body" style="gap:14px">
+    <div class="meta" style="font-size:14px">En MercApp todo se organiza por hogar: tus tiendas, productos y listas se comparten con tu familia.</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div class="t16">Crear un hogar</div>
+      <label class="l">Nombre del hogar</label><div class="input f">Casa Toro</div>
+      <div class="btn">Crear hogar</div>
+    </div>
+    <div class="row meta" style="justify-content:center">— o —</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div class="t16">Unirme con un código</div>
+      <div class="row" style="gap:6px">
+        <div class="input f" style="flex:1;text-align:center;letter-spacing:6px;font-weight:700;font-size:18px">F3D61F</div>
+      </div>
+      <div class="btn sec">Unirme</div>
+    </div>
+  </div>
+</div></figure>
+</div>
+
+<!-- ================= INICIO ================= -->
+<div class="seccion">2. Inicio y hogares</div>
+<div class="grid">
+
+<figure id="inicio"><figcaption>04 · Inicio<span>Ahorro del mes como dato principal, gasto vs. presupuesto, accesos rápidos. Botón de cámara central.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar" style="justify-content:space-between"><div><div class="hogar">Casa Toro ▾</div><h2 style="margin-top:6px">Hola, Silenia</h2></div><div class="avatar" style="border-radius:50%">ST</div></div>
+  <div class="body">
+    <div class="banner">
+      <div class="meta">Ahorraste este mes</div>
+      <div class="big">$18.400</div>
+      <div class="meta">↑ 12% más que en septiembre · vs. tu tienda de referencia</div>
+    </div>
+    <div class="card">
+      <div class="row"><span class="t16">Presupuesto de octubre</span><span class="meta">68%</span></div>
+      <div class="bar" style="margin:8px 0"><i style="width:68%"></i></div>
+      <div class="row meta"><span>Gastado <b class="price" style="color:var(--ink)">$408.000</b></span><span>de $600.000</span></div>
+    </div>
+    <div class="row" style="gap:10px">
+      <div class="card grow" style="text-align:center"><div class="t16">📋</div><div class="meta">Mi lista<br><b style="color:var(--ink)">8 productos</b></div></div>
+      <div class="card grow" style="text-align:center"><div class="t16">🏷️</div><div class="meta">Promos<br><b style="color:var(--ink)">3 vigentes</b></div></div>
+    </div>
+    <div class="card">
+      <div class="t16" style="margin-bottom:6px">Bajaron de precio</div>
+      <div class="list">
+        <div class="item"><div class="grow">Café Sello Rojo 500 g<div class="meta">D1 · hace 2 días</div></div><div style="text-align:right"><div class="price">$15.900</div><div class="meta" style="color:var(--primary)">↓ 8%</div></div></div>
+        <div class="item"><div class="grow">Aceite Premier 1 l<div class="meta">Éxito · ayer</div></div><div style="text-align:right"><div class="price">$11.200</div><div class="meta" style="color:var(--primary)">↓ 5%</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab on"><svg><use href="#i-home"/></svg>Inicio</div><div class="tab"><svg><use href="#i-search"/></svg>Comparar</div>
+    <div class="tab cam"><svg><use href="#i-cam"/></svg></div>
+    <div class="tab"><svg><use href="#i-list"/></svg>Mi lista</div><div class="tab"><svg><use href="#i-store"/></svg>Tiendas</div>
+  </div>
+</div></figure>
+
+<figure id="selector"><figcaption>05 · Selector de hogar<span>Hoja inferior al tocar el hogar del encabezado: cambiar, crear o unirse.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><div><div class="hogar">Casa Toro ▾</div><h2 style="margin-top:6px">Hola, Silenia</h2></div></div>
+  <div class="body"><div class="banner"><div class="meta">Ahorraste este mes</div><div class="big">$18.400</div></div></div>
+  <div class="scrim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="t16">Tus hogares</div>
+    <div class="list">
+      <div class="item"><div class="avatar">CT</div><div class="grow"><b>Casa Toro</b><div class="meta">3 miembros · admin</div></div><span class="chip g">Activo</span></div>
+      <div class="item"><div class="avatar o">CM</div><div class="grow"><b>Casa de mamá</b><div class="meta">2 miembros · miembro</div></div></div>
+    </div>
+    <div class="btn sec">+ Crear hogar</div>
+    <div class="btn ghost">Unirme con un código</div>
+  </div>
+</div></figure>
+
+<figure id="perfil"><figcaption>06 · Perfil y hogar<span>Miembros, invitar con código, presupuesto mensual, salir del hogar.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><h2>Casa Toro</h2></div>
+  <div class="body">
+    <div class="card">
+      <div class="t16" style="margin-bottom:4px">Miembros</div>
+      <div class="list">
+        <div class="item"><div class="avatar">ST</div><div class="grow">Silenia (tú)</div><span class="chip g">Admin</span></div>
+        <div class="item"><div class="avatar b">MC</div><div class="grow">María Camila</div><span class="chip n">Miembro</span></div>
+      </div>
+    </div>
+    <div class="card" style="background:var(--primary-tint);border-color:#CDE7D8">
+      <div class="t16">Invita a tu familia</div>
+      <div class="meta" style="margin:4px 0 8px">Comparte este código. Vence en 7 días.</div>
+      <div class="row"><span style="font-size:24px;font-weight:800;letter-spacing:6px;color:var(--primary-dark)">F3D61F</span><span class="chip g">Compartir</span></div>
+    </div>
+    <div class="card">
+      <div class="t16">Presupuesto mensual</div>
+      <div class="meta" style="margin:4px 0 8px">Te avisamos si tu lista se pasa.</div>
+      <div class="input f price">$600.000</div>
+    </div>
+    <div class="btn ghost" style="color:var(--error);margin-top:auto">Salir de este hogar</div>
+  </div>
+</div></figure>
+</div>
+
+<!-- ================= TIENDAS Y PRODUCTOS ================= -->
+<div class="seccion">3. Tiendas, productos y precios</div>
+<div class="grid">
+
+<figure id="tiendas"><figcaption>07 · Tiendas<span>Iniciales (no ilustraciones genéricas), favorita, activa/inactiva. Las inactivas no entran en comparaciones.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><h2>Mis tiendas</h2></div>
+  <div class="body">
+    <div class="seg"><span class="on">Activas (4)</span><span>Inactivas (1)</span></div>
+    <div class="card list">
+      <div class="item"><div class="avatar">ÉX</div><div class="grow"><b>Éxito Laureles</b><div class="meta">Supermercado · Cra 76 #35</div></div><span class="chip g">★ Favorita</span></div>
+      <div class="item"><div class="avatar o">D1</div><div class="grow"><b>D1 La 70</b><div class="meta">Descuento · Cl 44 #70</div></div></div>
+      <div class="item"><div class="avatar b">DP</div><div class="grow"><b>Tienda Don Pedro</b><div class="meta">Tienda de barrio · a 2 cuadras</div></div></div>
+      <div class="item"><div class="avatar">AR</div><div class="grow"><b>Ara Estadio</b><div class="meta">Descuento · Cl 48 #74</div></div></div>
+    </div>
+    <div class="meta" style="text-align:center">Solo las tiendas activas se usan para comparar y optimizar.</div>
+  </div>
+  <div class="fab">+</div>
+  <div class="tabs">
+    <div class="tab"><svg><use href="#i-home"/></svg>Inicio</div><div class="tab"><svg><use href="#i-search"/></svg>Comparar</div>
+    <div class="tab cam"><svg><use href="#i-cam"/></svg></div>
+    <div class="tab"><svg><use href="#i-list"/></svg>Mi lista</div><div class="tab on"><svg><use href="#i-store"/></svg>Tiendas</div>
+  </div>
+</div></figure>
+
+<figure id="nueva-tienda"><figcaption>08 · Nueva / editar tienda<span>Nombre, tipo, ubicación básica, favorita y activa.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><h2>Nueva tienda</h2></div>
+  <div class="body" style="gap:12px">
+    <label class="l">Nombre</label><div class="input f">Tienda Don Pedro</div>
+    <label class="l">Tipo</label>
+    <div class="row" style="flex-wrap:wrap;justify-content:flex-start;gap:6px">
+      <span class="chip n">Supermercado</span><span class="chip g">Tienda de barrio</span><span class="chip n">Minimercado</span><span class="chip n">Descuento</span><span class="chip n">Otro</span>
+    </div>
+    <label class="l">Dirección</label><div class="input f">Cra 70 #45-12</div>
+    <div class="placeholder" style="height:110px">Mapa · usar mi ubicación</div>
+    <div class="card row"><span>Marcar como favorita</span><span class="chip n">○</span></div>
+    <div class="card row"><span>Tienda activa</span><span class="chip g">● Sí</span></div>
+    <div class="btn" style="margin-top:auto">Guardar tienda</div>
+  </div>
+</div></figure>
+
+<figure id="nuevo-producto"><figcaption>09 · Nuevo producto<span>Todo producto pertenece a un grupo de equivalencia; la unidad debe ser compatible con el grupo.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><h2>Nuevo producto</h2></div>
+  <div class="body" style="gap:12px">
+    <label class="l">Nombre</label><div class="input f">Arroz</div>
+    <label class="l">Marca</label><div class="input f">Diana</div>
+    <label class="l">Grupo de equivalencia</label>
+    <div class="input f row"><span>Arroz blanco <span class="meta">· peso · Granos</span></span><span class="muted">▾</span></div>
+    <div class="meta" style="margin-top:-6px">Agrupa marcas y presentaciones que se pueden reemplazar entre sí.</div>
+    <label class="l">Presentación</label>
+    <div class="row" style="gap:8px"><div class="input f" style="flex:1">500</div>
+      <div class="seg" style="flex:1.4"><span class="on">g</span><span>kg</span></div></div>
+    <label class="l">Código de barras (opcional)</label><div class="input">Escanear o escribir</div>
+    <div class="btn" style="margin-top:auto">Guardar producto</div>
+  </div>
+</div></figure>
+
+<figure id="precio-manual"><figcaption>10 · Registrar precio manual<span>Tienda (solo activas), producto y valor. Muestra el precio por unidad calculado.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><h2>Registrar precio</h2></div>
+  <div class="body" style="gap:12px">
+    <label class="l">Producto</label><div class="input f row"><span>Arroz Diana 500 g</span><span class="muted">▾</span></div>
+    <label class="l">Tienda</label><div class="input f row"><span>Éxito Laureles</span><span class="muted">▾</span></div>
+    <label class="l">Precio</label><div class="input f price" style="font-size:22px">$5.400</div>
+    <label class="l">Fecha</label><div class="input f">Hoy, 15 oct 2026</div>
+    <div class="card" style="background:var(--primary-tint);border-color:#CDE7D8">
+      <div class="row"><span class="meta">Precio por kg</span><span class="price" style="color:var(--primary-dark)">$10.800 / kg</span></div>
+      <div class="row" style="margin-top:4px"><span class="meta">Antes en esta tienda</span><span class="meta">$5.000 · <b style="color:var(--error)">↑ 8%</b></span></div>
+    </div>
+    <div class="btn" style="margin-top:auto">Guardar precio</div>
+  </div>
+</div></figure>
+</div>
+
+<!-- ================= FOTO IA ================= -->
+<div class="seccion">4. Registro de precio por foto con IA (flujo estrella)</div>
+<div class="grid">
+
+<figure id="camara"><figcaption>11 · Cámara<span>Encuadre de la etiqueta o cartel. La foto se comprime y sube al bucket privado.</span></figcaption>
+<div class="phone" style="background:#141816"><div class="status" style="color:#fff"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar" style="color:#fff;justify-content:space-between"><span style="font-size:20px">✕</span><span class="chip" style="background:rgba(255,255,255,.15);color:#fff">Éxito Laureles ▾</span></div>
+  <div class="body" style="justify-content:center;align-items:center">
+    <div style="width:260px;height:300px;border:3px solid #fff;border-radius:18px;position:relative;display:flex;align-items:center;justify-content:center">
+      <div style="background:#FFF6C8;width:200px;padding:12px;border-radius:6px;color:#222;font-family:monospace;font-size:12px;line-height:1.5">ARROZ DIANA<br>500 g<br><b style="font-size:26px">$5.400</b><br>$10.800 x kg</div>
+    </div>
+    <div style="color:#D7DCD9;font-size:13px;margin-top:14px;text-align:center">Encuadra la etiqueta con el precio</div>
+  </div>
+  <div style="height:120px;display:flex;align-items:center;justify-content:center;gap:48px">
+    <div class="placeholder" style="width:44px;height:44px;border-radius:10px;background:#3A403C;color:#aaa">▣</div>
+    <div style="width:72px;height:72px;border-radius:50%;border:5px solid #fff;background:var(--primary)"></div>
+    <div style="width:44px;height:44px;color:#fff;display:flex;align-items:center;justify-content:center">⚡</div>
+  </div>
+</div></figure>
+
+<figure id="confirmacion-ia"><figcaption>12 · Confirmación de la IA<span>Todos los campos editables, cada uno con su nivel de confianza (punto verde/naranja/rojo). Tienda sugerida y fecha de captura.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><h2>Revisa los datos</h2></div>
+  <div class="body" style="gap:8px">
+    <div class="row" style="gap:10px"><div class="placeholder" style="width:64px;height:64px;flex:none">Foto</div>
+      <div class="meta">Revisa lo que leímos. Toca cualquier campo para corregirlo.</div></div>
+    <div class="field"><span class="conf h"></span><div class="grow"><small>Producto</small>Arroz</div></div>
+    <div class="row" style="gap:8px">
+      <div class="field grow"><span class="conf h"></span><div class="grow"><small>Marca</small>Diana</div></div>
+      <div class="field grow"><span class="conf h"></span><div class="grow"><small>Presentación</small>500 g</div></div>
+    </div>
+    <div class="field"><span class="conf h"></span><div class="grow"><small>Precio</small><b class="price" style="font-size:18px">$5.400</b></div><span class="meta">$10.800/kg</span></div>
+    <div class="field warn"><span class="conf m"></span><div class="grow"><small>Tienda · sugerida por el cartel</small>Éxito Laureles</div><span class="muted">▾</span></div>
+    <div class="field"><span class="conf h"></span><div class="grow"><small>Fecha de captura</small>15 oct 2026, 9:40</div></div>
+    <div class="card" style="background:var(--primary-tint);border-color:#CDE7D8;padding:10px">
+      <div class="meta" style="color:var(--primary-dark)"><b>Encontramos este producto</b> en tu catálogo: Arroz Diana 500 g (Arroz blanco)</div>
+    </div>
+    <div class="row meta" style="gap:10px;font-size:11px"><span><span class="conf h"></span> Seguro</span><span><span class="conf m"></span> Revisar</span><span><span class="conf lo"></span> Dudoso</span></div>
+    <div class="btn" style="margin-top:auto">Confirmar y guardar</div>
+  </div>
+</div></figure>
+
+<figure id="exito-foto"><figcaption>13 · Precio guardado<span>Dos accesos: agregar otro o ir al comparador de ese producto.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="body" style="justify-content:center;align-items:center;text-align:center;gap:14px;padding:0 28px">
+    <div style="width:80px;height:80px;border-radius:50%;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800">✓</div>
+    <div style="font-size:22px;font-weight:700">¡Precio guardado!</div>
+    <div class="muted">Arroz Diana 500 g a <b class="price" style="color:var(--ink)">$5.400</b> en Éxito Laureles</div>
+    <div class="card" style="width:100%"><div class="meta">La opción más barata del grupo es Florhuila 5 kg en Éxito</div><div class="price" style="color:var(--primary-dark)">$8.200 / kg · 24% menos</div></div>
+    <div class="btn" style="width:100%">Agregar otro</div>
+    <div class="btn sec" style="width:100%">Ver comparador</div>
+  </div>
+</div></figure>
+</div>
+
+<!-- ================= COMPARAR ================= -->
+<div class="seccion">5. Comparador e historial</div>
+<div class="grid">
+
+<figure id="comparar"><figcaption>14 · Comparar · búsqueda<span>Resultados por grupo (todas las presentaciones) y por producto.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><h2>Comparar</h2></div>
+  <div class="body">
+    <div class="input f row"><span>🔍 arroz</span><span class="muted">✕</span></div>
+    <div class="meta" style="font-weight:600">GRUPOS</div>
+    <div class="card row"><div><b>Arroz blanco</b><div class="meta">4 presentaciones · 4 tiendas</div></div><div style="text-align:right"><div class="meta">desde</div><div class="price">$8.200/kg</div></div></div>
+    <div class="meta" style="font-weight:600">PRODUCTOS</div>
+    <div class="card list">
+      <div class="item"><div class="grow"><b>Arroz Diana 500 g</b><div class="meta">3 tiendas</div></div><div class="price">$4.900</div></div>
+      <div class="item"><div class="grow"><b>Arroz Roa 1 kg</b><div class="meta">2 tiendas</div></div><div class="price">$8.500</div></div>
+      <div class="item"><div class="grow"><b>Arroz Florhuila 5 kg</b><div class="meta">1 tienda</div></div><div class="price">$41.000</div></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab"><svg><use href="#i-home"/></svg>Inicio</div><div class="tab on"><svg><use href="#i-search"/></svg>Comparar</div>
+    <div class="tab cam"><svg><use href="#i-cam"/></svg></div>
+    <div class="tab"><svg><use href="#i-list"/></svg>Mi lista</div><div class="tab"><svg><use href="#i-store"/></svg>Tiendas</div>
+  </div>
+</div></figure>
+
+<figure id="comparador-producto"><figcaption>15 · Comparador de un producto<span>Tiendas activas de menor a mayor; chip "Mejor precio", promo, fecha y variación.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><div><h2 style="font-size:19px">Arroz Diana 500 g</h2><div class="meta">Arroz blanco · Granos</div></div></div>
+  <div class="body">
+    <div class="card list">
+      <div class="item"><div class="avatar o">D1</div><div class="grow"><b>D1 La 70</b> <span class="chip g">Mejor precio</span><div class="meta">$9.800/kg · hace 2 días · ↓ 4%</div></div><div class="price" style="font-size:17px">$4.900</div></div>
+      <div class="item"><div class="avatar b">DP</div><div class="grow"><b>Don Pedro</b><div class="meta">$10.400/kg · hace 6 días</div></div><div class="price" style="font-size:17px">$5.200</div></div>
+      <div class="item"><div class="avatar">ÉX</div><div class="grow"><b>Éxito Laureles</b> <span class="chip o">2 x $9.900</span><div class="meta">$10.800/kg · hoy · ↑ 8%</div></div><div class="price" style="font-size:17px">$5.400</div></div>
+    </div>
+    <div class="card" style="background:var(--accent-tint);border-color:#F4D6B8">
+      <div class="meta" style="color:#7A3F08"><b>Hay una equivalente más barata:</b> Arroz Florhuila 5 kg en Éxito sale a $8.200/kg (16% menos por kilo).</div>
+    </div>
+    <div class="row" style="gap:8px;margin-top:auto"><div class="btn sec grow">Ver historial</div><div class="btn grow">+ A mi lista</div></div>
+  </div>
+</div></figure>
+
+<figure id="comparador-grupo"><figcaption>16 · Comparación por grupo<span>Precio por kg como dato principal: muestra que 1 kg a $8.500 rinde más que 500 g a $4.900.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><div><h2 style="font-size:19px">Arroz blanco</h2><div class="meta">Comparado por precio por kilo</div></div></div>
+  <div class="body">
+    <div class="seg"><span class="on">Por kg</span><span>Por precio</span></div>
+    <div class="card list">
+      <div class="item"><div class="grow"><b>Florhuila 5 kg</b> <span class="chip g">Más rinde</span><div class="meta">Éxito · $41.000 el paquete</div></div><div class="price">$8.200<span class="meta">/kg</span></div></div>
+      <div class="item"><div class="grow"><b>Roa 1 kg</b><div class="meta">D1 · $8.500 el paquete</div></div><div class="price">$8.500<span class="meta">/kg</span></div></div>
+      <div class="item"><div class="grow"><b>Diana 500 g</b><div class="meta">D1 · $4.900 el paquete</div></div><div class="price">$9.800<span class="meta">/kg</span></div></div>
+      <div class="item"><div class="grow"><b>Diana 500 g</b><div class="meta">Don Pedro · $5.200 el paquete</div></div><div class="price">$10.400<span class="meta">/kg</span></div></div>
+      <div class="item"><div class="grow"><b>Diana 500 g</b><div class="meta">Éxito · $5.400 el paquete</div></div><div class="price">$10.800<span class="meta">/kg</span></div></div>
+    </div>
+    <div class="btn" style="margin-top:auto">+ Agregar "Arroz blanco" a mi lista</div>
+  </div>
+</div></figure>
+
+<figure id="historial"><figcaption>17 · Historial de precio<span>Actual, anterior (último distinto), mínimo, máximo, promedio, fecha del último cambio y variación.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><div><h2 style="font-size:19px">Historial</h2><div class="meta">Arroz Diana 500 g · Éxito Laureles</div></div></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><div><div class="meta">Actual</div><div class="big">$5.400</div></div><span class="chip r">↑ 8% vs. $5.000</span></div>
+      <svg viewBox="0 0 280 110" style="width:100%;margin-top:8px">
+        <line x1="0" y1="100" x2="280" y2="100" stroke="#E5E7EB"/>
+        <polyline points="10,80 60,80 110,72 160,72 200,80 240,40 270,40" fill="none" stroke="#1E8E4F" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="270" cy="40" r="5" fill="#1E8E4F"/>
+        <text x="10" y="96" font-size="9" fill="#6B7280">jul</text><text x="125" y="96" font-size="9" fill="#6B7280">ago</text><text x="245" y="96" font-size="9" fill="#6B7280">oct</text>
+      </svg>
+    </div>
+    <div class="card list">
+      <div class="item"><span class="grow muted">Anterior</span><b class="price">$5.000</b></div>
+      <div class="item"><span class="grow muted">Mínimo</span><b class="price">$4.800</b></div>
+      <div class="item"><span class="grow muted">Máximo</span><b class="price">$5.400</b></div>
+      <div class="item"><span class="grow muted">Promedio</span><b class="price">$5.083</b></div>
+      <div class="item"><span class="grow muted">Último cambio</span><b>10 oct 2026</b></div>
+    </div>
+  </div>
+</div></figure>
+</div>
+
+<!-- ================= LISTA ================= -->
+<div class="seccion">6. Lista de mercado optimizada</div>
+<div class="grid">
+
+<figure id="mi-lista"><figcaption>18 · Mi lista<span>Necesidades genéricas con cantidad opcional; producto preferido opcional. Botón Optimizar.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar" style="justify-content:space-between"><h2>Mi lista</h2><span class="chip n">Compartida · 2</span></div>
+  <div class="body">
+    <div class="card list">
+      <div class="item"><div class="grow"><b>Arroz blanco</b><div class="meta">2 kg</div></div><span class="muted">⋮</span></div>
+      <div class="item"><div class="grow"><b>Leche entera</b><div class="meta">3 und · prefiero Alpina 1 l</div></div><span class="chip o">Promo</span></div>
+      <div class="item"><div class="grow"><b>Huevos AA</b><div class="meta">30 und</div></div><span class="muted">⋮</span></div>
+      <div class="item"><div class="grow"><b>Aceite vegetal</b><div class="meta">2 empaques</div></div><span class="muted">⋮</span></div>
+      <div class="item"><div class="grow"><b>Café molido</b><div class="meta">1 empaque</div></div><span class="muted">⋮</span></div>
+    </div>
+    <div class="input">+ Agregar lo que necesitas…</div>
+    <div class="card row"><span class="meta">Máximo de tiendas a visitar</span><span class="seg" style="width:120px"><span>1</span><span class="on">2</span><span>3</span></span></div>
+    <div class="btn" style="margin-top:auto">Optimizar mi lista</div>
+  </div>
+  <div class="tabs">
+    <div class="tab"><svg><use href="#i-home"/></svg>Inicio</div><div class="tab"><svg><use href="#i-search"/></svg>Comparar</div>
+    <div class="tab cam"><svg><use href="#i-cam"/></svg></div>
+    <div class="tab on"><svg><use href="#i-list"/></svg>Mi lista</div><div class="tab"><svg><use href="#i-store"/></svg>Tiendas</div>
+  </div>
+</div></figure>
+
+<figure id="resultado"><figcaption>19 · Resultado optimizado<span>Los dos escenarios lado a lado; detalle agrupado por tienda, subtotales, total, ahorro y aviso de presupuesto.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar"><span class="back">←</span><h2>Tu compra óptima</h2></div>
+  <div class="body" style="gap:8px">
+    <div class="row" style="gap:8px;align-items:stretch">
+      <div class="card grow" style="padding:10px"><div class="meta">Una tienda</div><div class="price" style="font-size:18px">$96.300</div><div class="meta">D1 La 70</div><div class="meta" style="color:var(--primary)">Ahorras $6.100</div></div>
+      <div class="card grow" style="padding:10px;border:2px solid var(--primary)"><span class="chip g">Más barato</span><div class="meta" style="margin-top:4px">Varias tiendas</div><div class="price" style="font-size:18px">$89.700</div><div class="meta">2 tiendas</div><div class="meta" style="color:var(--primary)"><b>Ahorras $12.700</b></div></div>
+    </div>
+    <div class="card" style="padding:10px">
+      <div class="row"><b>D1 La 70</b><span class="price">$52.900</span></div>
+      <div class="meta">Arroz Roa 1 kg × 2 · $17.000</div>
+      <div class="meta">Huevos Kikes x30 × 1 · $18.000</div>
+      <div class="meta">Aceite Premier 1 l × 2 · $17.900</div>
+    </div>
+    <div class="card" style="padding:10px">
+      <div class="row"><b>Éxito Laureles</b><span class="price">$36.800</span></div>
+      <div class="meta">Leche Alpina 1 l × 3 · $13.500 <span class="chip o">3 x $13.500</span></div>
+      <div class="meta">Café Sello Rojo 500 g × 1 · $23.300</div>
+    </div>
+    <div class="card" style="background:var(--accent-tint);border-color:#F4D6B8;padding:8px 10px"><div class="meta" style="color:#7A3F08">Te quedan $192.000 del presupuesto de octubre. ✓ Esta lista cabe.</div></div>
+    <div class="row" style="gap:8px;margin-top:auto"><div class="btn sec grow">PDF / compartir</div><div class="btn grow">Usar este plan</div></div>
+  </div>
+</div></figure>
+
+<figure id="compra"><figcaption>20 · En la tienda (lista compartida)<span>Estados por ítem en tiempo real: pendiente, comprado, no disponible, sustituido. "Terminar compra" registra la compra.</span></figcaption>
+<div class="phone"><div class="status"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="appbar" style="justify-content:space-between"><h2>Comprando</h2><span class="meta">● María Camila en línea</span></div>
+  <div class="body" style="gap:8px">
+    <div class="meta" style="font-weight:600">D1 LA 70</div>
+    <div class="card list" style="padding:4px 12px">
+      <div class="item"><div class="grow"><span class="strike">Arroz Roa 1 kg × 2</span></div><span class="chip g">Comprado</span></div>
+      <div class="item"><div class="grow">Huevos Kikes x30<div class="meta">Por: María Camila</div></div><span class="chip r">No disponible</span></div>
+      <div class="item"><div class="grow">Aceite Premier 1 l × 2<div class="meta">→ Aceite Gourmet 1 l</div></div><span class="chip o">Sustituido</span></div>
+    </div>
+    <div class="meta" style="font-weight:600">ÉXITO LAURELES</div>
+    <div class="card list" style="padding:4px 12px">
+      <div class="item"><div class="grow">Leche Alpina 1 l × 3</div><span class="chip n">Pendiente</span></div>
+      <div class="item"><div class="grow">Café Sello Rojo 500 g</div><span class="chip n">Pendiente</span></div>
+    </div>
+    <div class="btn" style="margin-top:auto">Terminar compra</div>
+  </div>
+</div></figure>
+</div>
+
+<p class="nota">Pantallas de semanas posteriores (promociones, configurar alertas, notificaciones, estadísticas) se bocetan en su semana, reutilizando estos mismos componentes. Modo captura: agregar <code>?solo=&lt;id&gt;</code> a la URL (por ejemplo <code>?solo=inicio</code>) para ver un solo teléfono.</p>
+
+<script>
+  try {
+    var solo = new URLSearchParams(location.search).get('solo');
+    if (solo) {
+      document.body.classList.add('solo');
+      var f = document.getElementById(solo);
+      if (f) f.classList.add('ver');
+    }
+  } catch (e) {}
+</script>
+</body>
+</html>

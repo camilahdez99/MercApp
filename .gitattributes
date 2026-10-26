@@ -1,0 +1,11 @@
+# Normaliza saltos de línea: en el repo siempre LF, aunque se trabaje en Windows.
+* text=auto eol=lf
+
+# Archivos binarios (no tocar)
+*.png binary
+*.jpg binary
+*.pdf binary
+*.docx binary
+*.aab binary
+*.apk binary
+*.hbc binary

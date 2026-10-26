@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>MercApp · Schema public</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #171717; font-family: Inter, "Segoe UI", system-ui, sans-serif; color: #ededed; }
+  #lienzo { position: relative;
+    background-color: #171717;
+    background-image: radial-gradient(#2e2e2e 1px, transparent 1px);
+    background-size: 16px 16px; }
+  svg { position: absolute; left: 0; top: 0; overflow: visible; }
+  .nodo { position: absolute; width: 260px; background: #1f1f1f; border: 1px solid #2e2e2e; border-radius: 6px;
+          overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,.35); }
+  .nodo .cab { height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #262626;
+               border-bottom: 1px solid #2e2e2e; font-size: 13px; font-weight: 500; color: #ededed; }
+  .nodo .cab svg { position: static; flex: none; }
+  .fila { height: 26px; display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 12px;
+          border-bottom: 1px solid #262626; position: relative; }
+  .fila:last-child { border-bottom: 0; }
+  .fila .ic { width: 14px; display: flex; justify-content: center; flex: none; }
+  .fila .ic svg { position: static; }
+  .fila .n { color: #d4d4d4; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fila .t { color: #8f8f8f; font-family: "Source Code Pro", Consolas, monospace; font-size: 11px; }
+  .barra { position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: #1c1c1c; border-top: 1px solid #2e2e2e;
+           display: flex; align-items: center; justify-content: center; gap: 22px; font-size: 12px; color: #a0a0a0; }
+  .barra span { display: inline-flex; align-items: center; gap: 6px; }
+  .barra svg { position: static; }
+  .esquema { position: absolute; left: 20px; top: 16px; display: flex; gap: 8px; align-items: center; font-size: 12px; color: #a0a0a0; }
+  .esquema b { color: #ededed; font-weight: 500; background: #262626; border: 1px solid #363636; border-radius: 4px; padding: 3px 10px; }
+</style>
+</head>
+<body>
+<div id="lienzo">
+  <div class="esquema">schema <b>public</b></div>
+  <svg id="lineas"></svg>
+</div>
+<script>
+// Columnas reales de la base (tipo, flags: p = llave primaria, n = not null)
+const T = {
+  hogares:             [['id','uuid','pn'],['nombre','text','n'],['presupuesto_mensual','numeric',''],['creado_en','timestamptz','n']],
+  categorias:          [['id','uuid','pn'],['nombre','text','n']],
+  perfiles:            [['id','uuid','pn'],['nombre','text','n'],['push_token','text',''],['hogar_activo_id','uuid',''],['creado_en','timestamptz','n']],
+  grupos_equivalencia: [['id','uuid','pn'],['hogar_id','uuid','n'],['nombre','text','n'],['categoria_id','uuid',''],['tipo_medida','text','n'],['creado_en','timestamptz','n']],
+  tiendas:             [['id','uuid','pn'],['hogar_id','uuid','n'],['nombre','text','n'],['tipo','text','n'],['direccion','text',''],['lat','float8',''],['lng','float8',''],['favorita','bool','n'],['activa','bool','n'],['creado_en','timestamptz','n']],
+  hogar_miembros:      [['hogar_id','uuid','pn'],['usuario_id','uuid','pn'],['rol','text','n'],['unido_en','timestamptz','n']],
+  invitaciones:        [['codigo','text','pn'],['hogar_id','uuid','n'],['creado_por','uuid','n'],['expira_en','timestamptz','n']],
+  alertas_config:      [['usuario_id','uuid','pn'],['tipo','text','pn'],['activa','bool','n'],['umbral_pct','numeric','']],
+  listas:              [['id','uuid','pn'],['hogar_id','uuid','n'],['nombre','text','n'],['estado','text','n'],['estrategia','text',''],['creada_por','uuid','n'],['creada_en','timestamptz','n']],
+  productos:           [['id','uuid','pn'],['hogar_id','uuid','n'],['grupo_id','uuid','n'],['nombre','text','n'],['marca','text',''],['cantidad','numeric','n'],['unidad','text','n'],['codigo_barras','text',''],['creado_en','timestamptz','n']],
+  compras:             [['id','uuid','pn'],['hogar_id','uuid','n'],['lista_id','uuid',''],['tienda_id','uuid',''],['total','numeric','n'],['ahorro','numeric','n'],['registrada_por','uuid','n'],['fecha','timestamptz','n']],
+  precios:             [['id','uuid','pn'],['producto_id','uuid','n'],['tienda_id','uuid','n'],['valor','numeric','n'],['fecha','timestamptz','n'],['origen','text','n'],['foto_path','text',''],['lectura_ia','jsonb',''],['confianza_ia','jsonb',''],['registrado_por','uuid','n']],
+  promociones:         [['id','uuid','pn'],['producto_id','uuid','n'],['tienda_id','uuid','n'],['tipo','text','n'],['valor','numeric',''],['cantidad_requerida','int4',''],['descripcion','text',''],['inicio','date','n'],['fin','date','n'],['creado_por','uuid','n']],
+  notificaciones:      [['id','uuid','pn'],['usuario_id','uuid','n'],['tipo','text','n'],['mensaje','text','n'],['producto_id','uuid',''],['promocion_id','uuid',''],['leida','bool','n'],['fecha','timestamptz','n']],
+  lista_items:         [['id','uuid','pn'],['lista_id','uuid','n'],['grupo_id','uuid','n'],['cantidad','numeric','n'],['unidad','text',''],['producto_preferido_id','uuid',''],['producto_asignado_id','uuid',''],['tienda_asignada_id','uuid',''],['unidades_a_comprar','int4',''],['precio_estimado','numeric',''],['promocion_id','uuid',''],['estado','text','n'],['sustituto_id','uuid',''],['actualizado_por','uuid',''],['actualizado_en','timestamptz','n']],
+  compra_items:        [['id','uuid','pn'],['compra_id','uuid','n'],['producto_id','uuid','n'],['unidades','int4','n'],['precio_unitario','numeric','n'],['subtotal','numeric','n'],['promocion_id','uuid','']],
+};
+// Llaves foráneas reales: [tabla, columna, tabla referenciada]
+const FK = [
+  ['perfiles','hogar_activo_id','hogares'],
+  ['grupos_equivalencia','hogar_id','hogares'], ['grupos_equivalencia','categoria_id','categorias'],
+  ['tiendas','hogar_id','hogares'],
+  ['hogar_miembros','hogar_id','hogares'], ['hogar_miembros','usuario_id','perfiles'],
+  ['invitaciones','hogar_id','hogares'], ['invitaciones','creado_por','perfiles'],
+  ['alertas_config','usuario_id','perfiles'],
+  ['listas','hogar_id','hogares'], ['listas','creada_por','perfiles'],
+  ['productos','hogar_id','hogares'], ['productos','grupo_id','grupos_equivalencia'],
+  ['compras','hogar_id','hogares'], ['compras','lista_id','listas'], ['compras','tienda_id','tiendas'], ['compras','registrada_por','perfiles'],
+  ['precios','producto_id','productos'], ['precios','tienda_id','tiendas'], ['precios','registrado_por','perfiles'],
+  ['promociones','producto_id','productos'], ['promociones','tienda_id','tiendas'], ['promociones','creado_por','perfiles'],
+  ['notificaciones','usuario_id','perfiles'], ['notificaciones','producto_id','productos'], ['notificaciones','promocion_id','promociones'],
+  ['lista_items','lista_id','listas'], ['lista_items','grupo_id','grupos_equivalencia'], ['lista_items','producto_preferido_id','productos'],
+  ['lista_items','producto_asignado_id','productos'], ['lista_items','tienda_asignada_id','tiendas'], ['lista_items','promocion_id','promociones'],
+  ['lista_items','sustituto_id','productos'], ['lista_items','actualizado_por','perfiles'],
+  ['compra_items','compra_id','compras'], ['compra_items','producto_id','productos'], ['compra_items','promocion_id','promociones'],
+];
+// Disposición izquierda → derecha (tablas referenciadas a la izquierda)
+const RANGOS = [
+  ['hogares', 'categorias'],
+  ['perfiles', 'grupos_equivalencia', 'tiendas'],
+  ['hogar_miembros', 'invitaciones', 'alertas_config', 'listas', 'productos'],
+  ['compras', 'precios', 'promociones'],
+  ['notificaciones', 'lista_items', 'compra_items'],
+];
+
+const ICON = {
+  tabla: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8f8f8f" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>',
+  llave: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b5b5b5" stroke-width="2.2" stroke-linecap="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M16 7l3 3M18.5 4.5l2 2"/></svg>',
+  rombo: '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 .8 9.2 5 5 9.2 .8 5Z" fill="#8f8f8f"/></svg>',
+  romboV: '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1.3 8.7 5 5 8.7 1.3 5Z" fill="none" stroke="#8f8f8f" stroke-width="1.2"/></svg>',
+};
+
+const W_NODO = 260, SEP_X = 150, MX = 60, MY = 80, SEP_Y = 34, HDR = 34, ROW = 26, BARRA = 40;
+const lienzo = document.getElementById('lienzo');
+const pos = {};
+const altoNodo = t => HDR + T[t].length * ROW + 2;
+
+const altos = RANGOS.map(r => r.reduce((s, t) => s + altoNodo(t), 0) + (r.length - 1) * SEP_Y);
+const altoMax = Math.max(...altos);
+
+RANGOS.forEach((rango, i) => {
+  const x = MX + i * (W_NODO + SEP_X);
+  let y = MY + (altoMax - altos[i]) / 2;
+  rango.forEach(nombre => {
+    const el = document.createElement('div');
+    el.className = 'nodo';
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.innerHTML = `<div class="cab">${ICON.tabla}${nombre}</div>` + T[nombre].map(([n, tipo, f]) => {
+      const ic = f.includes('p') ? ICON.llave : f.includes('n') ? ICON.rombo : ICON.romboV;
+      return `<div class="fila"><span class="ic">${ic}</span><span class="n">${n}</span><span class="t">${tipo}</span></div>`;
+    }).join('');
+    lienzo.appendChild(el);
+    pos[nombre] = { x, y, rango: i };
+    y += altoNodo(nombre) + SEP_Y;
+  });
+});
+
+// Conectores escalonados (como React Flow "smoothstep")
+const svg = document.getElementById('lineas');
+const ns = 'http://www.w3.org/2000/svg';
+const add = (tag, a) => { const e = document.createElementNS(ns, tag); for (const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e; };
+const yCol = (t, c) => pos[t].y + HDR + T[t].findIndex(r => r[0] === c) * ROW + ROW / 2 + 1;
+const pkCol = t => T[t].find(r => r[2].includes('p'))[0];
+
+const usados = {};  // reparte el codo vertical dentro de cada espacio entre columnas
+FK.forEach(([tabla, col, ref]) => {
+  const a = pos[ref], b = pos[tabla];
+  const x1 = a.x + W_NODO, y1 = yCol(ref, pkCol(ref));
+  const x2 = b.x, y2 = yCol(tabla, col);
+  const hueco = b.x - SEP_X;                      // inicio del espacio justo antes de la tabla destino
+  const k = usados[hueco] = (usados[hueco] || 0) + 1;
+  const mx = Math.min(hueco + 18 + ((k * 13) % (SEP_X - 36)), x2 - 14);
+  const r = Math.min(8, Math.abs(y2 - y1) / 2);
+  const s = y2 > y1 ? 1 : -1;
+  let d;
+  if (Math.abs(y2 - y1) < 1) d = `M${x1},${y1} H${x2}`;
+  else d = `M${x1},${y1} H${mx - r} Q${mx},${y1} ${mx},${y1 + s * r} V${y2 - s * r} Q${mx},${y2} ${mx + r},${y2} H${x2}`;
+  add('path', { d, fill: 'none', stroke: '#5c5c5c', 'stroke-width': 1.1 });
+  add('circle', { cx: x1, cy: y1, r: 2.6, fill: '#3ecf8e' });
+  add('circle', { cx: x2, cy: y2, r: 2.6, fill: '#3ecf8e' });
+});
+
+const W = MX * 2 + RANGOS.length * W_NODO + (RANGOS.length - 1) * SEP_X;
+const H = MY + altoMax + 50 + BARRA;
+lienzo.style.width = W + 'px'; lienzo.style.height = H + 'px';
+svg.setAttribute('width', W); svg.setAttribute('height', H);
+
+const barra = document.createElement('div');
+barra.className = 'barra';
+barra.innerHTML = `<span>${ICON.llave}Primary key</span><span>${ICON.rombo}Non-Nullable</span><span>${ICON.romboV}Nullable</span>`;
+lienzo.appendChild(barra);
+window.__size = { W, H };
+</script>
+</body>
+</html>

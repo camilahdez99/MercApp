@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>MercApp · Modelo de datos</title>
+<style>
+  :root {
+    --hogar: #2563eb; --catalogo: #059669; --precios: #ea580c; --listas: #7c3aed; --sistema: #64748b;
+    --ink: #0f172a; --muted: #64748b; --line: #94a3b8; --bg: #ffffff; --card: #ffffff; --rule: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); }
+  #lienzo { position: relative; }
+  header { position: absolute; left: 48px; top: 36px; }
+  header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+  header p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .dominio { position: absolute; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  svg { position: absolute; left: 0; top: 0; overflow: visible; }
+  .tabla { position: absolute; width: 300px; background: var(--card); border: 1px solid var(--rule);
+           border-radius: 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 4px 12px rgba(15,23,42,.05); }
+  .tabla h2 { font-size: 14px; font-weight: 700; color: #fff; padding: 8px 12px; height: 34px; display: flex;
+              align-items: center; justify-content: space-between; }
+  .tabla h2 small { font-weight: 500; font-size: 11px; opacity: .85; }
+  .fila { height: 22px; display: grid; grid-template-columns: 26px 1fr auto; align-items: center;
+          padding-right: 10px; font-size: 12.5px; border-top: 1px solid #f1f5f9; }
+  .fila .k { font-size: 9px; font-weight: 700; text-align: center; color: var(--muted); }
+  .fila .k.pk { color: #b45309; }
+  .fila .n.pk { font-weight: 700; }
+  .fila .t { font-family: Consolas, "Cascadia Mono", monospace; font-size: 11px; color: var(--muted); }
+  .fila .t.ref { font-family: inherit; font-weight: 600; font-size: 11px; }
+  .leyenda { position: absolute; font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .leyenda b { color: var(--ink); }
+  .chip { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin: 0 6px -1px 14px; }
+  .chip:first-child { margin-left: 0; }
+</style>
+</head>
+<body>
+<div id="lienzo">
+  <header>
+    <h1>MercApp · Modelo de datos</h1>
+    <p>Supabase (PostgreSQL) · esquema <code>public</code> · 16 tablas, todas con Row Level Security por hogar</p>
+  </header>
+  <svg id="lineas"></svg>
+</div>
+<script>
+const DOM = {
+  hogar:   { nombre: 'Hogar y usuarios',      color: 'var(--hogar)' },
+  catalogo:{ nombre: 'Catálogo y precios',    color: 'var(--catalogo)' },
+  listas:  { nombre: 'Listas y compras',      color: 'var(--listas)' },
+  sistema: { nombre: 'Supabase Auth',         color: 'var(--sistema)' },
+};
+const PRECIOS = 'var(--precios)';
+
+// [columna, tipo] ; tipo "→tabla" = llave foránea. PK marcadas con *
+const T = {
+  'auth.users':        { d: 'sistema', c: [['id*', 'uuid']] },
+  perfiles:            { d: 'hogar', c: [['id*', '→auth.users'], ['nombre','text'], ['push_token','text'], ['hogar_activo_id','→hogares'], ['creado_en','timestamptz']] },
+  hogares:             { d: 'hogar', c: [['id*','uuid'], ['nombre','text'], ['presupuesto_mensual','numeric'], ['creado_en','timestamptz']] },
+  hogar_miembros:      { d: 'hogar', c: [['hogar_id*','→hogares'], ['usuario_id*','→perfiles'], ['rol','text'], ['unido_en','timestamptz']] },
+  invitaciones:        { d: 'hogar', c: [['codigo*','text'], ['hogar_id','→hogares'], ['creado_por','→perfiles'], ['expira_en','timestamptz']] },
+  alertas_config:      { d: 'hogar', c: [['usuario_id*','→perfiles'], ['tipo*','text'], ['activa','bool'], ['umbral_pct','numeric']] },
+  notificaciones:      { d: 'hogar', c: [['id*','uuid'], ['usuario_id','→perfiles'], ['tipo','text'], ['mensaje','text'], ['producto_id','→productos'], ['promocion_id','→promociones'], ['leida','bool'], ['fecha','timestamptz']] },
+  categorias:          { d: 'catalogo', c: [['id*','uuid'], ['nombre','text']] },
+  grupos_equivalencia: { d: 'catalogo', c: [['id*','uuid'], ['hogar_id','→hogares'], ['nombre','text'], ['categoria_id','→categorias'], ['tipo_medida','text'], ['creado_en','timestamptz']] },
+  productos:           { d: 'catalogo', c: [['id*','uuid'], ['hogar_id','→hogares'], ['grupo_id','→grupos_equivalencia'], ['nombre','text'], ['marca','text'], ['cantidad','numeric'], ['unidad','text'], ['codigo_barras','text'], ['creado_en','timestamptz']] },
+  tiendas:             { d: 'catalogo', c: [['id*','uuid'], ['hogar_id','→hogares'], ['nombre','text'], ['tipo','text'], ['direccion','text'], ['lat','float8'], ['lng','float8'], ['favorita','bool'], ['activa','bool'], ['creado_en','timestamptz']] },
+  precios:             { d: 'catalogo', color: PRECIOS, c: [['id*','uuid'], ['producto_id','→productos'], ['tienda_id','→tiendas'], ['valor','numeric'], ['fecha','timestamptz'], ['origen','text'], ['foto_path','text'], ['lectura_ia','jsonb'], ['confianza_ia','jsonb'], ['registrado_por','→perfiles']] },
+  promociones:         { d: 'catalogo', color: PRECIOS, c: [['id*','uuid'], ['producto_id','→productos'], ['tienda_id','→tiendas'], ['tipo','text'], ['valor','numeric'], ['cantidad_requerida','int'], ['descripcion','text'], ['inicio','date'], ['fin','date'], ['creado_por','→perfiles']] },
+  listas:              { d: 'listas', c: [['id*','uuid'], ['hogar_id','→hogares'], ['nombre','text'], ['estado','text'], ['estrategia','text'], ['creada_por','→perfiles'], ['creada_en','timestamptz']] },
+  lista_items:         { d: 'listas', c: [['id*','uuid'], ['lista_id','→listas'], ['grupo_id','→grupos_equivalencia'], ['cantidad','numeric'], ['unidad','text'], ['producto_preferido_id','→productos'], ['producto_asignado_id','→productos'], ['tienda_asignada_id','→tiendas'], ['unidades_a_comprar','int'], ['precio_estimado','numeric'], ['promocion_id','→promociones'], ['estado','text'], ['sustituto_id','→productos'], ['actualizado_por','→perfiles'], ['actualizado_en','timestamptz']] },
+  compras:             { d: 'listas', c: [['id*','uuid'], ['hogar_id','→hogares'], ['lista_id','→listas'], ['tienda_id','→tiendas'], ['total','numeric'], ['ahorro','numeric'], ['registrada_por','→perfiles'], ['fecha','timestamptz']] },
+  compra_items:        { d: 'listas', c: [['id*','uuid'], ['compra_id','→compras'], ['producto_id','→productos'], ['unidades','int'], ['precio_unitario','numeric'], ['subtotal','numeric'], ['promocion_id','→promociones']] },
+};
+
+// Columnas del diagrama (de izquierda a derecha)
+const COLUMNAS = [
+  ['auth.users', 'perfiles', 'hogares', 'hogar_miembros', 'invitaciones', 'alertas_config', 'notificaciones'],
+  ['categorias', 'grupos_equivalencia', 'productos', 'tiendas', 'precios', 'promociones'],
+  ['listas', 'lista_items', 'compras', 'compra_items'],
+];
+// Relaciones que se escriben como texto (→ tabla) pero no se dibujan, para no recargar
+const SIN_LINEA = (tabla, col, ref) =>
+  (ref === 'hogares' && T[tabla].d !== 'hogar') ||
+  (ref === 'perfiles' && /^(creado_por|creada_por|registrado_por|registrada_por|actualizado_por)$/.test(col));
+
+const ANCHO = 300, GUTTER = 190, MX = 150, TOP = 150, GAP = 30, HDR = 34, ROW = 22;
+const lienzo = document.getElementById('lienzo');
+const pos = {};
+const colorDe = t => T[t].color || DOM[T[t].d].color;
+
+let alto = 0;
+COLUMNAS.forEach((col, i) => {
+  const x = MX + i * (ANCHO + GUTTER);
+  let y = TOP;
+  col.forEach(nombre => {
+    const t = T[nombre];
+    const el = document.createElement('div');
+    el.className = 'tabla';
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    const color = colorDe(nombre);
+    el.innerHTML = `<h2 style="background:${color}">${nombre}<small>${t.c.length} col.</small></h2>` +
+      t.c.map(([n, tipo]) => {
+        const pk = n.endsWith('*'), nombreCol = n.replace('*', ''), ref = tipo.startsWith('→') ? tipo.slice(1) : null;
+        const k = pk ? 'PK' : ref ? 'FK' : '';
+        const tipoHtml = ref
+          ? `<span class="t ref" style="color:${colorDe(ref)}">→ ${ref}</span>`
+          : `<span class="t">${tipo}</span>`;
+        return `<div class="fila"><span class="k ${pk ? 'pk' : ''}">${k}</span><span class="n ${pk ? 'pk' : ''}">${nombreCol}</span>${tipoHtml}</div>`;
+      }).join('');
+    lienzo.appendChild(el);
+    const h = HDR + t.c.length * ROW;
+    pos[nombre] = { x, y, h, colIdx: i };
+    y += h + GAP;
+  });
+  alto = Math.max(alto, y);
+});
+
+// Etiquetas de dominio encima de cada columna
+const titulos = [['Hogar y usuarios', 'var(--hogar)'], ['Catálogo, precios y promociones', 'var(--catalogo)'], ['Listas y compras', 'var(--listas)']];
+titulos.forEach(([txt, c], i) => {
+  const d = document.createElement('div');
+  d.className = 'dominio'; d.textContent = txt; d.style.color = c;
+  d.style.left = (MX + i * (ANCHO + GUTTER)) + 'px'; d.style.top = (TOP - 26) + 'px';
+  lienzo.appendChild(d);
+});
+
+// Líneas de llaves foráneas
+const svg = document.getElementById('lineas');
+const ns = 'http://www.w3.org/2000/svg';
+const yFila = (t, idx) => pos[t].y + HDR + idx * ROW + ROW / 2;
+const add = (tag, attrs) => { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; };
+
+Object.entries(T).forEach(([tabla, t]) => {
+  t.c.forEach(([n, tipo], idx) => {
+    if (!tipo.startsWith('→')) return;
+    const ref = tipo.slice(1), col = n.replace('*', '');
+    if (SIN_LINEA(tabla, col, ref) || !pos[ref]) return;
+    const a = pos[tabla], b = pos[ref];
+    const y1 = yFila(tabla, idx), y2 = yFila(ref, 0);
+    let x1, x2, d;
+    if (a.colIdx === b.colIdx) {             // misma columna: curva por la izquierda
+      x1 = a.x; x2 = b.x;
+      const bulge = 28 + Math.min(70, Math.abs(y2 - y1) * 0.12);
+      d = `M${x1},${y1} C${x1 - bulge},${y1} ${x2 - bulge},${y2} ${x2},${y2}`;
+    } else {
+      const derecha = b.colIdx > a.colIdx;
+      x1 = derecha ? a.x + ANCHO : a.x;
+      x2 = derecha ? b.x : b.x + ANCHO;
+      const dx = (x2 - x1) * 0.5;
+      d = `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
+    }
+    const color = colorDe(tabla);
+    add('path', { d, fill: 'none', stroke: color, 'stroke-width': 1.6, 'stroke-opacity': 0.55 });
+    add('circle', { cx: x1, cy: y1, r: 3.2, fill: '#fff', stroke: color, 'stroke-width': 1.6 });
+    const sx = a.colIdx === b.colIdx || b.colIdx > a.colIdx ? -1 : 1;  // lado por el que entra
+    add('line', { x1: x2 + sx * 7, y1: y2 - 6, x2: x2 + sx * 7, y2: y2 + 6, stroke: color, 'stroke-width': 2 });
+  });
+});
+
+// Leyenda
+const ley = document.createElement('div');
+ley.className = 'leyenda';
+ley.style.left = MX + 'px'; ley.style.top = (alto + 6) + 'px';
+ley.innerHTML =
+  `<span class="chip" style="background:var(--hogar)"></span>Hogar y usuarios` +
+  `<span class="chip" style="background:var(--catalogo)"></span>Catálogo` +
+  `<span class="chip" style="background:var(--precios)"></span>Precios y promociones` +
+  `<span class="chip" style="background:var(--listas)"></span>Listas y compras` +
+  `<span class="chip" style="background:var(--sistema)"></span>Supabase Auth<br>` +
+  `<b>PK</b> llave primaria · <b>FK → tabla</b> llave foránea · ○── referencia ──| tabla referenciada.<br>` +
+  `Por claridad no se dibujan las líneas de <b>hogar_id → hogares</b> fuera del bloque de hogar ni las de auditoría ` +
+  `(<b>creado_por / registrado_por / actualizado_por → perfiles</b>); aparecen indicadas en cada tabla.`;
+lienzo.appendChild(ley);
+
+const W = MX * 2 + COLUMNAS.length * ANCHO + (COLUMNAS.length - 1) * GUTTER;
+lienzo.style.width = W + 'px';
+lienzo.style.height = (alto + 90) + 'px';
+svg.setAttribute('width', W); svg.setAttribute('height', alto + 90);
+document.title = 'MercApp · Modelo de datos';
+window.__size = { W, H: alto + 90 };
+</script>
+</body>
+</html>
